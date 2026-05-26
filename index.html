@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Stemmebox</title>
+<meta name="viewport" content="width=1920, initial-scale=1.0">
+
+<style>
+
+/* ================= DESIGN TUNING ================= */
+/* Change ONLY this value to move the Start button up/down */
+:root {
+    --start-btn-y: 20px;
+    
+}
+
+/* ================= BASE ================= */
+body {
+    margin: 0;
+    height: 100vh;
+    background-color: #344C45;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.page {
+    display: none;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+}
+.page.active { display: flex; }
+
+/* ================= PANEL ================= */
+.panel {
+    background-color: #F6FBF7;
+    width: 1500px;
+    max-height: 92vh;
+    padding: 64px 72px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.center { text-align: center; }
+
+/* ================= START PAGE ================= */
+.start-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding-top: 16px;
+}
+    
+    /* ================= INTRO PAGE SPACING ================= */
+#introPage .panel {
+    padding-top: 8px;   /* default is 64px */
+}
+
+
+    /* ================= INTRO TEXT – EDITORIAL STYLE ================= */
+#introPage .intro-box p {
+    max-width: 644px;
+    margin: 1 auto;
+    line-height: 0.48;      /* tight, newspaper-like */
+}
+
+#introPage .intro-box .line {
+    display: block;
+    margin: 0;              /* remove vertical gaps */
+}
+
+/* Lead (headline-like) */
+#introPage .intro-box .line-1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+    #introPage .intro-box .line-1 {
+    text-transform: none;
+    font-variant-ligatures: common-ligatures;
+}
+
+
+/* Deck */
+#introPage .intro-box .line-2 {
+    font-size: 21px;
+    font-weight: 500;
+    margin-top: 4px;        /* very small separation */
+white-space: nowrap; 
+    }
+    
+
+/* Kicker / meta */
+#introPage .intro-box .line-3 {
+    font-size: 17px;
+    font-weight: 400;
+    margin-top: 6px;
+    color: #4F5E57;         /* subtle, not faded */
+white-space: nowrap; 
+    }
+
+
+
+/* ================= TEXT ================= */
+h1 {
+    font-size: 30px;
+    margin-bottom: 28px;
+    color: #2E3D37;
+}
+    
+    /* ================= START HEADLINE ================= */
+.start-headline {
+    max-width: 820px;
+    font-size: 62px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #2E3D37;
+    text-align: center;
+    margin: 4px 0 -45px 0;
+}
+    /* ================= START SUBLINE ================= */
+.start-subline {
+    max-width: 720px;
+    font-size: 22px;
+    line-height: 1.4;
+    color: #4F5E57;
+    margin: 0;
+}
+    /* Center voice title on page 3 */
+#questionPage h1 {
+    text-align: center;
+}
+
+p {
+    font-size: 20px;
+    line-height: 1.6;
+    color: #2E3D37;
+    white-space: pre-line;
+}
+
+/* ================= BUTTONS ================= */
+button {
+    background: none;
+    border: 3px solid #9BBF8A;
+    color: #2E3D37;
+    padding: 16px 40px;
+    border-radius: 32px;
+    font-size: 18px;
+    cursor: pointer;
+    opacity: 0.4;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+   
+}
+
+button.primary {
+    background-color: #9BBF8A;
+    border-color: #9BBF8A;
+}
+    #introPage button.primary {
+    position: relative;
+    top: -31px;
+}
+
+
+button.enabled {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+button.ready {
+    animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* ================= START BUTTON ANIMATION ================= */
+@keyframes startPulse {
+    0% {
+        transform: scale(1) translateY(var(--start-btn-y));
+        box-shadow: 0 0 0 rgba(155,191,138,0);
+    }
+    50% {
+        transform: scale(1.06) translateY(var(--start-btn-y));
+        box-shadow: 0 0 20px rgba(155,191,138,0.45);
+    }
+    100% {
+        transform: scale(1) translateY(var(--start-btn-y));
+        box-shadow: 0 0 0 rgba(155,191,138,0);
+    }
+}
+
+#startPage button.primary {
+    animation: startPulse 2.6s ease-in-out infinite;
+}
+
+/* ================= LOGO ================= */
+.logo {
+    max-width: 900px;
+    display: block;
+    margin: 0;
+    mix-blend-mode: multiply;
+}
+
+/* ================= HEADPHONE HINT ================= */
+.headphone-hint {
+    opacity: 0.6;
+    font-size: 16px;
+    color: #2E3D37;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.2;
+}
+
+.headphone-icon {
+    width: 56px;
+    height: 50px;
+    fill: #2E3D37;
+    animation: headphonePulse 5s ease-in-out infinite;
+}
+
+@keyframes headphonePulse {
+    0% { transform: scale(1); opacity: 0.55; }
+    50% { transform: scale(1.08); opacity: 0.9; }
+    100% { transform: scale(1); opacity: 0.55; }
+}
+
+/* ================= VIDEO ================= */
+.video-wrap {
+    margin: 32px 0 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #E6EFEA;
+    
+    border: 3px solid #9BBF8A;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.video-wrap video {
+    width: 100%;
+    pointer-events: none;
+}
+
+/* ================= QUESTIONS ================= */
+.question { margin-bottom: 44px; }
+
+.question-text {
+    font-size: 20px;
+    margin-bottom: 14px;
+}
+
+/* ===== SCALE ===== */
+.scale {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.scale::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    height: 3px;
+    background-color: #C8D6CE;
+    transform: translateY(-50%);
+}
+
+.step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #F6FBF7;
+    border: 3px solid #9BBF8A;
+    cursor: pointer;
+    z-index: 1;
+}
+.step.active {
+    background-color: #9BBF8A;
+    transform: scale(1.25);
+}
+
+.scale-labels {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    color: #6C7A73;
+}
+
+/* ================= BACKGROUND PAGE CENTERING ================= */
+.background-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.background-layout .question {
+    width: 100%;
+    max-width: 620px;
+}
+.background-layout .choice-row {
+    justify-content: center;
+}
+
+/* ================= BACKGROUND ================= */
+.choice-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.choice {
+    padding: 12px 26px;
+    border-radius: 28px;
+    border: 3px solid #C8D6CE;
+    cursor: pointer;
+    font-size: 16px;
+}
+.choice.active {
+    background-color: #9BBF8A;
+    border-color: #9BBF8A;
+}
+
+/* ================= ACTIONS ================= */
+.actions {
+    margin-top: 48px;
+    display: flex;
+    justify-content: space-between;
+}
+
+    /* ================= INTRO TEXT BOX ================= */
+.intro-box {
+    margin-top: 0;
+    margin-bottom: 32px;
+    padding: 0px 32px;
+    background-color: #E6EFEA;
+    border-left: 6px solid #9BBF8A;
+    border-radius: 8px;
+    text-align: left;
+}
+    
+    /* ================= INTRO PAGE TEXT ================= */
+
+.intro-box {
+    margin-bottom: 28px;
+    padding: 0;                 /* ← no box padding */
+    background: none;           /* ← remove box feel */
+    border: none;               /* ← remove accent line */
+    text-align: left;
+}
+    
+    /* ================= PAGE 2 INFO BOX ================= */
+.page2-box {
+    margin: 0 auto 32px auto;
+    padding: 28px 32px;
+    max-width: 1000px;
+    background-color: #E6EFEA;
+    border-left: 6px solid #9BBF8A;
+    border-radius: 8px;
+}
+
+.page2-box h2 {
+    font-size: 26px;
+    margin: 0 0 8px 0;
+    color: #2E3D37;
+}
+
+.page2-box p {
+    font-size: 20px;
+    margin: 0;
+    white-space: nowrap; /* keeps it on one line */
+}
+
+/* ================= VIDSTE DU AT ================= */
+.did-you-know {
+    margin-top: 28px;
+    padding: 28px 32px;
+    background-color: #E6EFEA;
+    border-left: 6px solid #9BBF8A;
+    border-radius: 8px;
+    text-align: left;
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+#thankYouPage.active .did-you-know {
+    animation: fadeUp 1.2s ease-out forwards,
+               softPulse 3s ease-in-out 1.5s 1;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes softPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.015); }
+    100% { transform: scale(1); }
+}
+    /* ================= PROJECT CREDIT ================= */
+.project-credit {
+    margin-top: 36px;
+    font-size: 16px;
+    color: #6C7A73;
+    opacity: 0;
+    transform: translateY(16px);
+    text-align: center;
+}
+
+/* Fade in after the info box */
+#thankYouPage.active .project-credit {
+    animation: fadeUp 1s ease-out 0.8s forwards;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- PAGE 1 -->
+<div id="startPage" class="page active">
+<div class="panel center start-layout">
+
+
+
+<h1 class="start-headline">
+    Deltag i undersøgelsen
+</h1>
+
+<p class="start-subline">
+    Det tager 1 – 2 minutter og bidrager til forskningsprojektet Stemmeboxen.
+</p>
+
+<div class="headphone-hint">
+<svg class="headphone-icon" viewBox="0 0 24 24">
+<path d="M12 3a9 9 0 0 0-9 9v6a2 2 0 0 0 2 2h2v-7H5v-1a7 7 0 0 1 14 0v1h-2v7h2a2 2 0 0 0 2-2v-6a9 9 0 0 0-9-9z"/>
+</svg>
+Tag venligst høretelefoner på
+</div>
+
+<button class="primary enabled" onclick="show('introPage')">Start</button>
+
+</div>
+</div>
+
+<!-- PAGE 2 -->
+<div id="introPage" class="page">
+<div class="panel center">
+
+<div class="page2-box">
+    <h2>Vidste du, at du kan få teksten på borger.dk læst op?</h2>
+    <p>På næste side kan du lytte til de digitale stemmer 'Siri 1' og 'Siri 2', og fortælle hvad du synes om dem.</p>
+</div>
+
+<div class="video-wrap">
+<video autoplay muted loop playsinline>
+<source src="BorgerNewZoom2Low.mp4" type="video/mp4">
+</video>
+</div>
+
+<button class="primary enabled" onclick="startVoice(0)">Start</button>
+
+</div>
+</div>
+
+<!-- PAGE 3 -->
+<div id="questionPage" class="page">
+<div class="panel">
+<h1 id="voiceTitle"></h1>
+
+<div class="question">
+<div class="question-text">Stemmen virker troværdig og imødekommende</div>
+<div class="scale">
+<div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div>
+</div>
+<div class="scale-labels">
+<span>Meget uenig</span><span>Uenig</span><span>Delvist enig</span><span>Enig</span><span>Meget enig</span>
+</div>
+</div>
+
+<div class="question">
+<div class="question-text">Jeg forstår, hvad der bliver sagt</div>
+<div class="scale">
+<div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div>
+</div>
+<div class="scale-labels">
+<span>Meget uenig</span><span>Uenig</span><span>Delvist enig</span><span>Enig</span><span>Meget enig</span>
+</div>
+</div>
+
+<div class="question">
+<div class="question-text">Det er en god stemme for din kommune</div>
+<div class="scale">
+<div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div><div class="step"></div>
+</div>
+<div class="scale-labels">
+<span>Meget uenig</span><span>Uenig</span><span>Delvist enig</span><span>Enig</span><span>Meget enig</span>
+</div>
+</div>
+
+<div class="actions">
+<button onclick="playAudio()" class="enabled">Afspil stemme igen</button>
+<button id="nextBtn" class="primary">Næste</button>
+</div>
+</div>
+</div>
+
+<!-- PAGE 4 -->
+<div id="backgroundPage" class="page">
+<div class="panel center background-layout">
+
+
+<div class="question">
+<div class="question-text">Dit køn</div>
+<div class="choice-row">
+<div class="choice">Kvinde</div>
+<div class="choice">Mand</div>
+<div class="choice">Andet</div>
+</div>
+</div>
+
+<div class="question">
+<div class="question-text">Din alder</div>
+<div class="choice-row">
+<div class="choice">0 - 18 år</div>
+<div class="choice">18 – 40 år</div>
+<div class="choice">over 40 år</div>
+</div>
+</div>
+
+<div class="question">
+<div class="question-text">Er dansk dit modersmål?</div>
+<div class="choice-row">
+<div class="choice">Ja</div>
+<div class="choice">Nej</div>
+</div>
+</div>
+
+<div class="actions">
+<button id="submitBtn" class="primary">Indsend besvarelse</button>
+</div>
+</div>
+</div>
+
+<!-- PAGE 5 -->
+<div id="thankYouPage" class="page">
+<div class="panel center">
+
+<h1>Tak for dit svar</h1>
+
+<div class="did-you-know">
+<h2>Vidste du at:</h2>
+<p> En ny Tilgængelighedslov trådte i kraft i alle EU-lande den 28. juni 2025. Den skal bl.a. sikre at myndighedsbetjening er tilgængelig for alle, der er permanent eller midlertidigt forhindret i at læse teksten på skærmen. På Borger.dk finder du linket ”Guide til oplæsning af tekst” nederst på siden, hvor du henvises til at anvende den tekst-til-tale teknologi, der er indlejret i din egen computer
+</p>
+</div>
+    <div class="project-credit">
+    Forsknings- og formidlingsprojektet Stemmeboxen er støttet af Carlsbergfondet
+</div>
+<button class="primary enabled" onclick="resetAll()" style="margin-top:40px;">
+    Tilbage til start
+</button>
+
+</div>
+</div>
+
+<audio id="audioPlayer"></audio>
+
+<script>
+
+function show(id) {
+    stopAudio();
+
+    document.querySelectorAll(".page")
+        .forEach(p => p.classList.remove("active"));
+
+    document.getElementById(id)
+        .classList.add("active");
+}
+
+const audioPlayer = document.getElementById("audioPlayer");
+
+// ================= VOICES =================
+
+let voices = [
+    { name: "Siri 1", file: "Siri1.mp3" },
+    { name: "Siri 2", file: "Siri2.mp3" }
+].sort(() => Math.random() - 0.5);
+
+let currentVoice = 0;
+
+let resetTimer;
+
+// ================= CSV STORAGE =================
+
+let surveyCounter = 1;
+
+let csvRows = [];
+
+let surveyResults = {
+    voices: {}
+};
+
+const questionKeys = [
+    "trustworthy",
+    "understandable",
+    "municipality"
+];
+
+// ================= AUDIO =================
+
+function playAudio() {
+
+    audioPlayer.src = voices[currentVoice].file;
+
+    audioPlayer.currentTime = 0;
+
+    audioPlayer.play();
+}
+
+function stopAudio() {
+
+    audioPlayer.pause();
+
+    audioPlayer.currentTime = 0;
+}
+
+// ================= START VOICE =================
+
+function startVoice(index) {
+
+    currentVoice = index;
+
+    document.getElementById("voiceTitle").textContent =
+        "Vurdér " + voices[currentVoice].name;
+
+    resetScales();
+
+    resetNextButton();
+
+    updateNextButton();
+
+    show("questionPage");
+
+    playAudio();
+}
+
+// ================= NEXT VOICE =================
+
+function nextVoice() {
+
+    if (currentVoice < voices.length - 1) {
+
+        startVoice(currentVoice + 1);
+
+    } else {
+
+        show("backgroundPage");
+    }
+}
+
+// ================= RESET =================
+
+function resetScales() {
+
+    document.querySelectorAll(".step")
+        .forEach(step => step.classList.remove("active"));
+}
+
+function resetNextButton() {
+
+    const btn = document.getElementById("nextBtn");
+
+    btn.classList.remove("enabled", "ready");
+
+    btn.onclick = null;
+}
+
+// ================= NEXT BUTTON =================
+
+function updateNextButton() {
+
+    const answered = [...document.querySelectorAll(".scale")]
+        .every(scale => scale.querySelector(".step.active"));
+
+    const btn = document.getElementById("nextBtn");
+
+    if (answered) {
+
+        btn.classList.add("enabled", "ready");
+
+        btn.onclick = saveVoiceAnswers;
+    }
+}
+
+// ================= SCALE HANDLING =================
+
+document.querySelectorAll(".scale").forEach((scale, questionIndex) => {
+
+    scale.querySelectorAll(".step").forEach((step, stepIndex) => {
+
+        step.dataset.value = stepIndex + 1;
+
+        step.addEventListener("click", () => {
+
+            scale.querySelectorAll(".step")
+                .forEach(s => s.classList.remove("active"));
+
+            step.classList.add("active");
+
+            updateNextButton();
+        });
+
+    });
+
+});
+
+// ================= SAVE VOICE ANSWERS =================
+
+function saveVoiceAnswers() {
+
+    const voiceName = voices[currentVoice].name;
+
+    surveyResults.voices[voiceName] = {};
+
+    document.querySelectorAll(".scale").forEach((scale, index) => {
+
+        const active = scale.querySelector(".step.active");
+
+        surveyResults.voices[voiceName][questionKeys[index]] =
+            Number(active.dataset.value);
+
+    });
+
+    console.log("VOICE DATA:");
+    console.log(surveyResults);
+
+    nextVoice();
+}
+
+// ================= DEMOGRAPHIC QUESTIONS =================
+
+function updateSubmit() {
+
+    const answered = [...document.querySelectorAll("#backgroundPage .choice-row")]
+        .every(row => row.querySelector(".choice.active"));
+
+    const btn = document.getElementById("submitBtn");
+
+    if (answered) {
+
+        btn.classList.add("enabled", "ready");
+
+        btn.onclick = submitSurvey;
+    }
+}
+
+document.querySelectorAll(".choice-row").forEach(row => {
+
+    row.addEventListener("click", e => {
+
+        if (e.target.classList.contains("choice")) {
+
+            row.querySelectorAll(".choice")
+                .forEach(c => c.classList.remove("active"));
+
+            e.target.classList.add("active");
+
+            updateSubmit();
+        }
+
+    });
+
+});
+
+// ================= SUBMIT =================
+
+function submitSurvey() {
+
+    const rows = document.querySelectorAll("#backgroundPage .choice-row");
+
+    const genderText =
+        rows[0].querySelector(".choice.active").textContent.trim();
+
+    const ageText =
+        rows[1].querySelector(".choice.active").textContent.trim();
+
+    const nativeText =
+        rows[2].querySelector(".choice.active").textContent.trim();
+
+    const genderMap = {
+        "Kvinde": 1,
+        "Mand": 2,
+        "Andet": 3
+    };
+
+    const ageMap = {
+        "0 - 18 år": 1,
+        "18 – 40 år": 2,
+        "over 40 år": 3
+    };
+
+    const nativeMap = {
+        "Ja": 1,
+        "Nej": 2
+    };
+
+    const firstVoiceName = voices[0].name;
+    const secondVoiceName = voices[1].name;
+
+    const v1 = surveyResults.voices[firstVoiceName] || {};
+    const v2 = surveyResults.voices[secondVoiceName] || {};
+
+    const now = new Date();
+
+    const pad = n => String(n).padStart(2, "0");
+
+    const timestamp =
+        pad(now.getDate()) + "-" +
+        pad(now.getMonth() + 1) + "-" +
+        String(now.getFullYear()).slice(-2) +
+        " - " +
+        pad(now.getHours()) + ":" +
+        pad(now.getMinutes());
+
+    const row = [
+
+        surveyCounter,
+
+        timestamp,
+
+        firstVoiceName,
+
+        v1.trustworthy || 0,
+        v1.understandable || 0,
+        v1.municipality || 0,
+
+        secondVoiceName,
+
+        v2.trustworthy || 0,
+        v2.understandable || 0,
+        v2.municipality || 0,
+
+        genderMap[genderText] || 0,
+        ageMap[ageText] || 0,
+        nativeMap[nativeText] || 0
+
+    ].join(",");
+
+    csvRows.push(row);
+    
+    
+fetch("https://script.google.com/macros/s/AKfycbw0kf_Gmas6yUyfSLdp_OJO6ilv1OiLMGI4GTiZsr2ZjiXEHSYv_F_ADx5io0lcEXlf/exec", {
+
+    method: "POST",
+    
+    mode: "no-cors",
+
+    headers: {
+        "Content-Type": "application/json"
+    },
+
+    body: JSON.stringify({
+
+        id: surveyCounter,
+
+        time: timestamp,
+
+        voice1: firstVoiceName,
+        q1: v1.trustworthy || 0,
+        q2: v1.understandable || 0,
+        q3: v1.municipality || 0,
+
+        voice2: secondVoiceName,
+        q4: v2.trustworthy || 0,
+        q5: v2.understandable || 0,
+        q6: v2.municipality || 0,
+
+        gender: genderMap[genderText] || 0,
+        age: ageMap[ageText] || 0,
+        native: nativeMap[nativeText] || 0
+
+    })
+
+})
+.then(response => response.text())
+.then(data => console.log("Saved:", data))
+.catch(error => console.error("Error:", error));
+
+
+
+    console.log("CSV ROW:");
+    console.log(row);
+
+    console.log("ALL CSV DATA:");
+    console.log(csvRows.join("\n"));
+
+    surveyCounter++;
+
+    stopAudio();
+
+    show("thankYouPage");
+
+    clearTimeout(resetTimer);
+
+    resetTimer = setTimeout(resetAll, 20000);
+}
+
+// ================= RESET ALL =================
+
+function resetAll() {
+
+    stopAudio();
+
+    currentVoice = 0;
+
+    voices = voices.sort(() => Math.random() - 0.5);
+
+    surveyResults = {
+        voices: {}
+    };
+
+    document.querySelectorAll(".step, .choice")
+        .forEach(el => el.classList.remove("active"));
+
+    resetNextButton();
+
+    document.getElementById("submitBtn").className = "primary";
+
+    show("startPage");
+}
+
+</script>
+
+</body>
+</html>
