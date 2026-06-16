@@ -441,10 +441,10 @@ button.ready {
         width: 100%;
     }
 
-       .scale-labels {
+    .scale-labels {
         font-size: 12px;
     }
-    
+
     .scale-labels span {
         flex: 1;
         text-align: center;
@@ -485,19 +485,36 @@ button.ready {
     }
 
     .choice {
-        width: 100%;
         text-align: center;
         padding: 14px;
+         flex: 1 1 180px;
+        
     }
 
     .headphone-icon {
         width: 42px;
         height: 42px;
     }
-    
-     #introPage button.primary {
+
+    #introPage button.primary {
         top: 0;
     }
+
+} /* ← closes 1024px media query */
+
+
+/* Phones only */
+@media (max-width: 600px) {
+
+    .choice-row {
+        flex-direction: column;
+    }
+
+    .choice {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
 }
 
 </style>
